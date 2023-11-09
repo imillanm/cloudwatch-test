@@ -31,7 +31,7 @@ resource "aws_instance" "servidor" {
   //Asociar instancia con Security groups y colocamos una referencia al SG
   vpc_security_group_ids = [aws_security_group.grupo_de_seguridad.id]
 
-  iam_instance_profile = aws_iam_role.cw_logs_ec2
+  iam_instance_profile = aws_iam_role_policy_attachment.cw_attachment
 
   //Coneccion SSH keyname con Keypair en AWS
   //key_name = "aws_keypair"
@@ -42,14 +42,14 @@ resource "aws_instance" "servidor" {
               sudo su
               yum update -y
               yum install -y awslogs
-              cd /etc/awslogs/
-
-
               EOF         
   tags = {
     Name = each.value.nombre
   }
 }
+
+//roles politica con tf y congfiruacion de la maquina con ANSIBLE
+// ansble template crear lña carpeta dentro del repo -- j2 es la extension
 
 //Grupo de seguridad con acceso al puerto 8080
 resource "aws_security_group" "grupo_de_seguridad" {
@@ -57,11 +57,11 @@ resource "aws_security_group" "grupo_de_seguridad" {
   vpc_id = data.aws_vpc.default.id
   //Definimos los ingress que tendria el bloque CIDR todas las IP
   ingress {
-    cidr_blocks =   ["0.0.0.0/0"] // todas las ip
-    description     = "Acceso al puerto 8080 desde el exterior"
-    from_port       = var.puerto_servidor // puerto que vamos a abrir con la to_port
-    to_port         = var.puerto_servidor
-    protocol        = "TCP" // protocolo que utilizaremos
+    cidr_blocks = ["0.0.0.0/0"] // todas las ip
+    description = "Acceso al puerto 8080 desde el exterior"
+    from_port   = var.puerto_servidor // puerto que vamos a abrir con la to_port
+    to_port     = var.puerto_servidor
+    protocol    = "TCP" // protocolo que utilizaremos
   }
 
   ingress {
@@ -83,35 +83,63 @@ resource "aws_security_group" "grupo_de_seguridad" {
 
   //Regla salida (Con esta permitimos instalar cosas para ansible con playbook)
   egress {
-    from_port = 0
-    to_port = 0
-    protocol = "-1"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
 }
 
-resource "aws_iam_role" "cw_logs_ec2" {
-  name = "cw_logs_ec1"
-  assume_role_policy = <<POLICY
+resource "aws_iam_policy" "cw_logs_ec2_policy" {
+  name        = "cw_logs_ec1"
+  description = "politica de cloudwatch agent"
+  path        = "/"
+
+  policy = jsonencode(
+    {
+      "Version" : "2012-10-17",
+      "Statement" : [
+        {
+          "Effect" : "Allow",
+          "Action" : [
+            "logs:CreateLogGroup",
+            "logs:CreateLogStream",
+            "logs:PutLogEvents",
+            "logs:DescribeLogStreams"
+          ],
+          "Resource" : [
+            "*"
+          ]
+        }
+      ]
+  })
+}
+
+resource "aws_iam_role" "cw_logs_ec2_role" {
+  name               = "cw_logs_ec2_role"
+  description = "rol cw ec2"
+
+  assume_role_policy = jsonencode(
   {
   "Version": "2012-10-17",
   "Statement": [
     {
       "Effect": "Allow",
-      "Action": [
-        "logs:CreateLogGroup",
-        "logs:CreateLogStream",
-        "logs:PutLogEvents",
-        "logs:DescribeLogStreams"
-    ],
+      "Action": "sts:AssumeRole",
+      "Sid": ""
       "Resource": [
         "*"
     ]
   }
  ]
+})
 }
-  POLICY
+
+resource "aws_iam_role_policy_attachment" "cw_attachment" {
+  role = aws_iam_role.cw_logs_ec2_role.name
+  policy_arn = aws_iam_policy.cw_logs_ec2_policy.arn
 }
+  
 
 /*
 // Definimos un nuevo SG que permita acceso al puerto 80 desde el exterior y coneccion SSH
