@@ -31,14 +31,20 @@ resource "aws_instance" "servidor" {
   //Asociar instancia con Security groups y colocamos una referencia al SG
   vpc_security_group_ids = [aws_security_group.grupo_de_seguridad.id]
 
+  iam_instance_profile = aws_iam_role.cw_logs_ec2
+
   //Coneccion SSH keyname con Keypair en AWS
   //key_name = "aws_keypair"
 
   //Comandos para que ejecute un servidor en puerto 8080 y muestre fichero ondex.html con un mensaje
   user_data = <<-EOF
               #!/bin/bash
+              sudo su
               yum update -y
               yum install -y awslogs
+              cd /etc/awslogs/
+
+
               EOF         
   tags = {
     Name = each.value.nombre
@@ -82,6 +88,29 @@ resource "aws_security_group" "grupo_de_seguridad" {
     protocol = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
+}
+
+resource "aws_iam_role" "cw_logs_ec2" {
+  name = "cw_logs_ec1"
+  assume_role_policy = <<POLICY
+  {
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "logs:CreateLogGroup",
+        "logs:CreateLogStream",
+        "logs:PutLogEvents",
+        "logs:DescribeLogStreams"
+    ],
+      "Resource": [
+        "*"
+    ]
+  }
+ ]
+}
+  POLICY
 }
 
 /*
