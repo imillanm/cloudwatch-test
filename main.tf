@@ -115,34 +115,34 @@ resource "aws_iam_policy" "cw_logs_ec2_policy" {
   })
 }
 
-resource "aws_iam_role" "cw_logs_ec2_role" {
-  name               = "cw_logs_ec2_role"
+resource "aws_iam_role" "cw_ec2_role" {
+  name        = "cw_ec2_role"
   description = "rol cw ec2"
 
   assume_role_policy = jsonencode(
-  {
-  "Version": "2012-10-17",
-  "Statement": [
     {
-      "Effect": "Allow",
-      "Action": "sts:AssumeRole",
-      "Sid": ""
-      "Resource": [
-        "*"
-    ]
-  }
- ]
-})
+      "Version" : "2012-10-17",
+      "Statement" : [
+        {
+          "Effect" : "Allow",
+          "Action" : "sts:AssumeRole",
+          "Sid" : ""
+          "Resource" : [
+            "*"
+          ]
+        }
+      ]
+  })
 }
 
 resource "aws_iam_role_policy_attachment" "cw_attachment" {
-  role = aws_iam_role.cw_logs_ec2_role.name
+  role       = aws_iam_role.cw_ec2_role.name
   policy_arn = aws_iam_policy.cw_logs_ec2_policy.arn
 }
-  
+
 resource "aws_iam_instance_profile" "ec2_profile" {
   name = "ec2-profile"
-  role = aws_iam_role.cw_logs_ec2_role.name
+  role = aws_iam_role.cw_ec2_role.name
 }
 
 /*
