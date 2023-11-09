@@ -31,7 +31,7 @@ resource "aws_instance" "servidor" {
   //Asociar instancia con Security groups y colocamos una referencia al SG
   vpc_security_group_ids = [aws_security_group.grupo_de_seguridad.id]
 
-  iam_instance_profile = aws_iam_role_policy_attachment.cw_attachment
+  iam_instance_profile = aws_iam_instance_profile.ec2_profile.name
 
   //Coneccion SSH keyname con Keypair en AWS
   //key_name = "aws_keypair"
@@ -140,6 +140,10 @@ resource "aws_iam_role_policy_attachment" "cw_attachment" {
   policy_arn = aws_iam_policy.cw_logs_ec2_policy.arn
 }
   
+resource "aws_iam_instance_profile" "ec2_profile" {
+  name = "ec2-profile"
+  role = aws_iam_role.cw_logs_ec2_role.name
+}
 
 /*
 // Definimos un nuevo SG que permita acceso al puerto 80 desde el exterior y coneccion SSH
