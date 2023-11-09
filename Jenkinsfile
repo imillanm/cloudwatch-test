@@ -2,7 +2,7 @@ pipeline{
     agent any
     environment {
         AWS_DEFAULT_REGION="us-west-2"
-        THE_BUTLER_SAYS_SO=credentials('cris_lf')
+        THE_BUTLER_SAYS_SO=credentials('cw')
     }
     tools {
         terraform 'terraform-11'
