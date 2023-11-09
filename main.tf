@@ -32,7 +32,7 @@ resource "aws_instance" "servidor" {
   vpc_security_group_ids = [aws_security_group.grupo_de_seguridad.id]
 
   //Coneccion SSH keyname con Keypair en AWS
-  key_name = "aws_keypair"
+  //key_name = "aws_keypair"
 
   //Comandos para que ejecute un servidor en puerto 8080 y muestre fichero ondex.html con un mensaje
   user_data = <<-EOF
