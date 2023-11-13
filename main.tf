@@ -42,7 +42,11 @@ resource "aws_instance" "servidor" {
               sudo su -
               yum update -y
               yum install -y awslogs
-              sed -i 's%file = /var/log/messages%file = /u01/Domains/logs/info_commercedebbit_Mrse.log%g' /etc/awslogs/awslogs.conf
+              cd /var/log
+              echo "primer log de la app" > apptest.log
+              sed -i 's%file = /var/log/messages%file = /var/log/apptest.log%g' /etc/awslogs/awslogs.conf
+              sed -i 's%region = us-east-1%region = us-west-2%g' /etc/awslogs/awscli.conf
+              sudo service awslogsd start
               EOF         
   tags = {
     Name = each.value.nombre
