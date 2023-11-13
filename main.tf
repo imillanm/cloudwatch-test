@@ -44,8 +44,8 @@ resource "aws_instance" "servidor" {
               yum install -y awslogs
               cd /var/log
               echo "primer log de la app" > apptest.log
-              sed -i 's%file = /var/log/messages%file = /var/log/apptest.log,awslogs.log%g' /etc/awslogs/awslogs.conf
-              sed -i 's%log_group_name = /var/log/messages%log_group_name = /var/log/mensages2%g' /etc/awslogs/awslogs.conf
+              sed -i 's%file = /var/log/messages%file = /var/log/apptest.log,/var/log/awslogs.log%g' /etc/awslogs/awslogs.conf
+              sed -i 's%log_group_name = /var/log/messages%log_group_name = /var/log/mensages10%g' /etc/awslogs/awslogs.conf
               sed -i 's%region = us-east-1%region = us-west-2%g' /etc/awslogs/awscli.conf
               sudo service awslogsd start
               EOF         
