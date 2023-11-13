@@ -39,9 +39,12 @@ resource "aws_instance" "servidor" {
   //Comandos para que ejecute un servidor en puerto 8080 y muestre fichero ondex.html con un mensaje
   user_data = <<-EOF
               #!/bin/bash
-              sudo su
+              sudo su -
               yum update -y
               yum install -y awslogs
+
+              sed -i 's%file = /var/log/application.log%file = /u01/Domains/logs/info_commercedebbit_Mrse.log%g' /etc/awslogs/awslogs.conf
+
               EOF         
   tags = {
     Name = each.value.nombre
@@ -145,33 +148,4 @@ resource "aws_iam_instance_profile" "ec2_profile" {
   role = aws_iam_role.cw_ec2_role.name
 }
 
-/*
-// Definimos un nuevo SG que permita acceso al puerto 80 desde el exterior y coneccion SSH
-resource "aws_security_group" "alb" {
-  name = "alb-sg"
-  // regla de entrada para SSH
-  ingress {
-    cidr_blocks = ["0.0.0.0/0"] // todas las ip
-    description = "SSH"
-    from_port   = 22 // puerto que vamos a abrir con la to_port
-    to_port     = 22
-    protocol    = "TCP"
-  }
 
-  ingress {
-    cidr_blocks = ["0.0.0.0/0"] // todas las ip
-    description = "Acceso al puerto 80 desde el exterior"
-    from_port   = var.puerto_lb // puerto que vamos a abrir con la to_port
-    to_port     = var.puerto_lb
-    protocol    = "TCP"
-  }
-
-  egress {
-    cidr_blocks = ["0.0.0.0/0"] // todas las ip
-    description = "Acceso al puerto 8080 de nuestros servidores"
-    from_port   = var.puerto_servidor // puerto que vamos a abrir con la to_port
-    to_port     = var.puerto_servidor
-    protocol    = "TCP"
-  }
-}
-*/
