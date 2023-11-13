@@ -37,6 +37,7 @@ resource "aws_instance" "servidor" {
   //key_name = "aws_keypair"
 
   //Comandos para que ejecute un servidor en puerto 8080 y muestre fichero ondex.html con un mensaje
+  /*
   user_data = <<-EOF
               #!/bin/bash
               sudo su -
@@ -45,13 +46,57 @@ resource "aws_instance" "servidor" {
               cd /var/log
               echo "primer log de la app" > apptest.log
               sed -i 's%file = /var/log/messages%file = /var/log/apptest.log%g' /etc/awslogs/awslogs.conf
-              sed -i 's%log_group_name = /var/log/messages%log_group_name = /var/log/mensages20%g' /etc/awslogs/awslogs.conf
+              sed -i 's%log_group_name = /var/log/messages%log_group_name = /var/log/mensages33%g' /etc/awslogs/awslogs.conf
               sed -i 's%region = us-east-1%region = us-west-2%g' /etc/awslogs/awscli.conf
               sudo service awslogsd start
               EOF         
   tags = {
     Name = each.value.nombre
   }
+
+  */
+
+  user_data = <<-EOF
+              #!/bin/bash
+              sudo su -
+              yum update -y
+              yum install -y awslogs
+              cd /var/log
+              echo "primer log de la apptes" > apptest.log
+              echo "primer log de la apptes5" > apptest5.log
+              echo "primer log de la app" > apptest.log
+              echo "[general]
+              state_file = /var/lib/awslogs/agent-state
+
+              [/var/log/apptest]
+              datetime_format = %b %d %H:%M:%S
+              file = /var/log/apptest.log
+              buffer_duration = 5000
+              log_stream_name = {instance_id}
+              initial_position = start_of_file
+              log_group_name = /var/log/apptest
+
+              [/var/log/awslogs]
+              datetime_format = %b %d %H:%M:%S
+              file = /var/log/awslogs.log
+              buffer_duration = 5000
+              log_stream_name = {instance_id}
+              initial_position = start_of_file
+              log_group_name = /var/log/awslogs
+
+              [/var/log/apptest5]
+              datetime_format = %b %d %H:%M:%S
+              file = /var/log/apptest5.log
+              buffer_duration = 5000
+              log_stream_name = {instance_id}
+              initial_position = start_of_file
+              log_group_name = /var/log/apptest5" > awslogs.conf
+              sudo service awslogsd start
+              EOF         
+  tags = {
+    Name = each.value.nombre
+  }
+
 }
 
 //roles politica con tf y congfiruacion de la maquina con ANSIBLE
