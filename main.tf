@@ -65,6 +65,7 @@ resource "aws_instance" "servidor" {
               echo "primer log de la apptes" > apptest.log
               echo "primer log de la apptes5" > apptest5.log
               echo "primer log de la app" > apptest.log
+              cd /etc/awslogs/
               echo "[general]
               state_file = /var/lib/awslogs/agent-state
 
