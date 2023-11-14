@@ -64,8 +64,8 @@ resource "aws_instance" "servidor" {
               cd /var/log
               echo "primer log de la apptes" > apptest.log
               echo "primer log de la apptes5" > apptest5.log
-              echo "primer log de la app" > apptest.log
               cd /etc/awslogs/
+              sed -i 's%region = us-east-1%region = us-west-2%g' /etc/awslogs/awscli.conf
               echo "[general]
               state_file = /var/lib/awslogs/agent-state
 
