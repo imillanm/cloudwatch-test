@@ -37,7 +37,7 @@ resource "aws_instance" "servidor" {
   //key_name = "aws_keypair"
 
   //Comandos para que ejecute un servidor en puerto 8080 y muestre fichero ondex.html con un mensaje
-  /*
+  
   user_data = <<-EOF
               #!/bin/bash
               sudo su -
@@ -54,7 +54,7 @@ resource "aws_instance" "servidor" {
     Name = each.value.nombre
   }
 
-  */
+  /*
 
   user_data = <<-EOF
               #!/bin/bash
@@ -97,6 +97,7 @@ resource "aws_instance" "servidor" {
   tags = {
     Name = each.value.nombre
   }
+  */
 
 }
 
