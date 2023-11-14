@@ -43,6 +43,35 @@ resource "aws_instance" "servidor" {
               sudo su -
               yum update -y
               yum install -y awslogs
+
+              LOG_DIR="/var/logs"
+            CONF_FILE="awslogs.conf"
+
+            for logfile in "$LOG_DIR"/*.log; do
+                if [ -f "$logfile" ]; then
+                    log_group_name="/aws/logs/$(basename "$logfile" | sed 's/[^A-Za-z0-9._-]/-/g' | sed 's/\.log$//')"
+                    cat >> "$CONF_FILE"
+            [$log_group_name]
+            datetime_format = %Y-%m-%dT%H:%M:%S
+            file = $logfile
+            buffer_duration = 5000
+            log_stream_name = {instance_id}
+            initial_position = start_of_file
+            log_group_name = $log_group_name
+            
+            fi
+            done
+            EOF         
+  tags = {
+    Name = each.value.nombre
+  }
+
+  /*
+  user_data = <<-EOF
+              #!/bin/bash
+              sudo su -
+              yum update -y
+              yum install -y awslogs
               cd /var/log
               echo "primer log de la app" > apptest.log
               sed -i 's%file = /var/log/messages%file = /var/log/apptest.log%g' /etc/awslogs/awslogs.conf
@@ -54,8 +83,9 @@ resource "aws_instance" "servidor" {
     Name = each.value.nombre
   }
 
-  /*
-
+*/
+  
+/*
   user_data = <<-EOF
               #!/bin/bash
               sudo su -
@@ -87,7 +117,7 @@ resource "aws_instance" "servidor" {
 
               [/var/log/apptest5]
               datetime_format = %b %d %H:%M:%S
-              file = /var/log/apptest5.log
+              file = /var/log/abc.log
               buffer_duration = 5000
               log_stream_name = {instance_id}
               initial_position = start_of_file
