@@ -48,7 +48,7 @@ resource "aws_instance" "servidor" {
               echo "primer log de la app3" > apptest3.log
               echo "primer log de la app4" > apptest4.log
               echo "primer log de la app_2023_11_14" > apptest_2023_11_14.log
-              sed -i 's%file = /var/log/messages%file = /var/log/apptest.log%g' /etc/awslogs/awslogs.conf
+              sed -i 's%file = /var/log/messages%file = /var/log/apptest*.log%g' /etc/awslogs/awslogs.conf
               sed -i 's%log_group_name = /var/log/messages%log_group_name = /var/log/mensages33%g' /etc/awslogs/awslogs.conf
               sed -i 's%region = us-east-1%region = us-west-2%g' /etc/awslogs/awscli.conf
               sudo service awslogsd start
