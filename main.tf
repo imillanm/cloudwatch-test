@@ -197,6 +197,6 @@ resource "aws_iam_role_policy_attachment" "cw_attachment" {
 
 // Instance Profile, ese se asocia con la instancia.
 resource "aws_iam_instance_profile" "ec2profile" {
-  name = "ec2-profile"
+  name = "ec2--profile"
   role = aws_iam_role.cw_ec2_role.name
 }
