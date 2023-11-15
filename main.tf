@@ -9,7 +9,7 @@ data "aws_vpc" "default" {
   default = true // si esta en true devuelve la vpc por defecto que hay en aws
 }
 
-// Variables locals, si tenemos valores repetidos agruparlos en bloques llamados locals y referenciarlos
+//Variables locals, si tenemos valores repetidos agruparlos en bloques llamados locals y referenciarlos
 locals {
   region = "us-west-2"
   ami    = var.ubuntu_ami[local.region]
@@ -36,37 +36,7 @@ resource "aws_instance" "servidor" {
   //Coneccion SSH keyname con Keypair en AWS
   //key_name = "aws_keypair"
 
-  //Comandos para que ejecute un servidor en puerto 8080 y muestre fichero ondex.html con un mensaje
-  
-  user_data = <<-EOF
-              #!/bin/bash
-              sudo su -
-              yum update -y
-              yum install -y awslogs
-
-              LOG_DIR="/var/logs"
-            CONF_FILE="awslogs.conf"
-
-            for logfile in "$LOG_DIR"/*.log; do
-                if [ -f "$logfile" ]; then
-                    log_group_name="/aws/logs/$(basename "$logfile" | sed 's/[^A-Za-z0-9._-]/-/g' | sed 's/\.log$//')"
-                    cat >> "$CONF_FILE"
-            [$log_group_name]
-            datetime_format = %Y-%m-%dT%H:%M:%S
-            file = $logfile
-            buffer_duration = 5000
-            log_stream_name = {instance_id}
-            initial_position = start_of_file
-            log_group_name = $log_group_name
-            
-            fi
-            done
-            EOF         
-  tags = {
-    Name = each.value.nombre
-  }
-
-  /*
+  //Comandos para que instale awslogs
   user_data = <<-EOF
               #!/bin/bash
               sudo su -
@@ -74,6 +44,10 @@ resource "aws_instance" "servidor" {
               yum install -y awslogs
               cd /var/log
               echo "primer log de la app" > apptest.log
+              echo "primer log de la app2" > apptest2.log
+              echo "primer log de la app3" > apptest3.log
+              echo "primer log de la app4" > apptest4.log
+              echo "primer log de la app_2023_11_14" > apptest_2023_11_14.log
               sed -i 's%file = /var/log/messages%file = /var/log/apptest.log%g' /etc/awslogs/awslogs.conf
               sed -i 's%log_group_name = /var/log/messages%log_group_name = /var/log/mensages33%g' /etc/awslogs/awslogs.conf
               sed -i 's%region = us-east-1%region = us-west-2%g' /etc/awslogs/awscli.conf
@@ -82,8 +56,6 @@ resource "aws_instance" "servidor" {
   tags = {
     Name = each.value.nombre
   }
-
-*/
   
 /*
   user_data = <<-EOF
@@ -131,9 +103,6 @@ resource "aws_instance" "servidor" {
 
 }
 
-//roles politica con tf y congfiruacion de la maquina con ANSIBLE
-// ansble template crear lña carpeta dentro del repo -- j2 es la extension
-
 //Grupo de seguridad con acceso al puerto 8080
 resource "aws_security_group" "grupo_de_seguridad" {
   name   = "servidor-sg"
@@ -173,6 +142,7 @@ resource "aws_security_group" "grupo_de_seguridad" {
   }
 }
 
+// Politica
 resource "aws_iam_policy" "cw_logs_ec2_policy" {
   name        = "cw_logs_ec1"
   description = "politica de cloudwatch agent"
@@ -198,6 +168,7 @@ resource "aws_iam_policy" "cw_logs_ec2_policy" {
   })
 }
 
+// ROL
 resource "aws_iam_role" "cw_ec2_role" {
   name        = "cw_ec2_role"
   description = "rol cw ec2"
@@ -218,14 +189,14 @@ resource "aws_iam_role" "cw_ec2_role" {
   })
 }
 
+// Attachment
 resource "aws_iam_role_policy_attachment" "cw_attachment" {
   role       = aws_iam_role.cw_ec2_role.name
   policy_arn = aws_iam_policy.cw_logs_ec2_policy.arn
 }
 
+// Instance Profile, ese se asocia con la instancia.
 resource "aws_iam_instance_profile" "ec2_profile" {
   name = "ec2-profile"
   role = aws_iam_role.cw_ec2_role.name
 }
-
-
