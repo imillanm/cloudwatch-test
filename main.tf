@@ -36,6 +36,7 @@ resource "aws_instance" "servidor" {
   //Coneccion SSH keyname con Keypair en AWS
   //key_name = "aws_keypair"
 
+/*
   //Comandos para que instale awslogs
   user_data = <<-EOF
               #!/bin/bash
@@ -53,6 +54,7 @@ resource "aws_instance" "servidor" {
   tags = {
     Name = each.value.nombre
   }
+*/
   
 /*
   user_data = <<-EOF
@@ -70,7 +72,7 @@ resource "aws_instance" "servidor" {
 
               [/var/log/apptest]
               datetime_format = %b %d %H:%M:%S
-              file = /var/log/apptest.log
+              file = /var/log/*.log
               buffer_duration = 5000
               log_stream_name = {instance_id}
               initial_position = start_of_file
