@@ -34,6 +34,7 @@ pipeline{
                 sh 'terraform apply -auto-approve'
             }
         }
+        //este paso es para destruir los subido a aws.
         stage('Terraform destroy'){
             when {
                 expression { choice == 'destroy' }
