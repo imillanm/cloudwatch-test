@@ -35,6 +35,7 @@ resource "aws_instance" "servidor" {
 
   //Coneccion SSH keyname con Keypair en AWS
   //key_name = "aws_keypair"
+  //hola mundo
 
 /*
   //Comandos para que instale awslogs
